@@ -9,23 +9,41 @@ app = Flask(__name__, static_url_path='/static')
 #    print("Test Received")
 #    return 'test',200 # response to your request.
 
+# Formats the data like this: 34.28, -118.43, 'Location=San Fernando Smoke Level=653 Temp=56 C',
+def constructLocation(content):
+    data = content["payload_fields"]
+    TEMP = str(float(data["temperature_1"]) * (9/5) + 32.0)
+    HUMID = data["relative_humidity_2"]
+    SMOKE = data["analog_out_3"]
+
+    location = content['metadata']
+    lat = location['latitude']
+    long = location['longitude']
+
+    response = requests.get("https://api.tomtom.com/search/2/reverseGeocode/"+lat+"%2C"+long+".json?key=4mXdXKAv0CQKru0SpInttSAw2CVOliMz")
+    responseData = json.loads(response.text)
+    city = responseData['addresses'][0]['address']['freeformAddress']
+
+    speedData = requests.get("https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+long+"&appid=37e350cbd0d4c12e3438f9a194a20693")
+    data_wind = json.loads(speedData.text)
+
+    # convert m/s --> mph
+    windSpeed = str(float(data_wind["wind"]["speed"]) * 2.23694)
+
+    csv = lat + "," + long + "," + "\'Location: " + city + ", Smoke Level: " + SMOKE + " ppm Temp: " + TEMP + "°C Wind: " + windSpeed + " mph\',"
+    print(csv)
+    return csv
+
 @app.route('/flameless', methods=['POST'])
 def result():
     print("Received")
     content = request.json # should display 'bar'
-    data = content["payload_fields"]
-#    temp = data["Temperature"]
 
+    csv = constructLocation(content)
+    markers = open("marker_locations.txt","a")
+    #markers.write(csv)
 
-    location = content['metadata']
-    latitude = location['latitude']
-    longitude = location['longitude']
-
-    print(latitude)
-    print(longitude)
-#    print(content['payload_fields'])
     return '',200 # response to your request.
-
 
 ############## BEGIN WEBSITE ROUTES HERE ##############
 
@@ -104,7 +122,7 @@ def reports():
 ############## END WEBSITE ROUTES HERE ##############
 
 if __name__ == '__main__':
-  app.run(ssl_context=('cert.pem', 'key.pem'),host="0.0.0.0",debug=True)
+  app.run(host="0.0.0.0",port=8000,debug=True)
 
 
 #if __name__ == "__main__":
