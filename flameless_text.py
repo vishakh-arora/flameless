@@ -23,7 +23,8 @@ import os
 
 def mail(to, subject, text=None, html=None, attach=None):
    msg = MIMEMultipart()
-   msg['From'] = "cayenne<do-not-reply@srvusd-lunch.com>" #gmail_user
+   from_user = "Flameless Server<do-not-reply@srvusd-lunch.com>"
+   msg['From'] = from_user #gmail_user
    msg['To'] = to
 #','.split(to)
    msg['Subject'] = subject
@@ -60,7 +61,7 @@ def mail(to, subject, text=None, html=None, attach=None):
    # Should be mailServer.quit(), but that crashes...
    mailServer.close()
 
-def generate_email():
+def generate_email(lat, long, temp, city, wind):
     #i = vals
     to = "9259646667@txt.att.net"
     #name = i[COL_NAME]
@@ -69,7 +70,8 @@ def generate_email():
 
      # The embedded image doesn't show up in gmail so use inline attachment
      # '<br>\n<img src="data:image/png;base64,{0}" alt="">'.format(data_uri) + \
-    htmlbody = "Fire detected at (37.77042000, -121.90381000) with temperature 55 C heading for San Ramon"
+    htmlbody = 'Fire detected at (%s, %s) with temperature %s F heading for %s at %s mph' % (lat, long, temp, city, wind)
+    print("TEXTTT: "+htmlbody)
 #    textbody=strip_html( htmlbody)
 
     try:
@@ -78,4 +80,4 @@ def generate_email():
     except Exception as e:
         print("ERROR: Failed to send email to: "+to+": "+str(e))
 
-generate_email()
+#generate_email()
