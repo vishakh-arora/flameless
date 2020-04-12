@@ -42,7 +42,7 @@ def destination():
 @app.route('/data/locations')
 def locations():
     fin = open("marker_locations.txt","r")
-    ret = fin.read()
+    ret = fin.read()[:-1]
     fin.close()
     return ret
 

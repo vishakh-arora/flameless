@@ -39,6 +39,13 @@
             basePath: '/sdk'
         });
 
+       var markerOptions = {
+           icon: tomtom.L.icon({
+            iconUrl: '/sdk/../img/fire-icon.png',
+            iconSize: [25, 38],
+           })
+       };
+
         //set center of map
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -65,7 +72,7 @@
         var markers = tomtom.L.markerClusterGroup();
         addressPoints.forEach(function(point) {
             var title = point[2],
-                marker = tomtom.L.marker(new tomtom.L.LatLng(point[0], point[1]), {title: title},{draggable:true});
+		 marker = tomtom.L.marker(new tomtom.L.LatLng(point[0], point[1]), {title: title, icon: markerOptions.icon });
             marker.bindPopup(title);//.addTo(map);
             marker.on('click', function(e) {
             var coordinate = e.target.getLatLng();

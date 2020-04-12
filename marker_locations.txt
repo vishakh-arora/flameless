@@ -16,4 +16,5 @@
 39.76, -121.62, 'Location=Paradise Smoke Level=572 Temp=50 C',
 39.76, -121.61, 'Location=Paradise Smoke Level=572 Temp=50 C',
 39.77, -121.60, 'Location=Paradise Smoke Level=572 Temp=50 C',
-38.76, -121.63, 'Location=Paradise Smoke Level=572 Temp=50 C'
+38.76, -121.63, 'Location=Paradise Smoke Level=572 Temp=50 C',
+37.77042, -121.90381, 'Location: San Ramon CA 94582 Smoke Level: 320 ppm Temp: 81.0°C Wind: 3.4 mph',

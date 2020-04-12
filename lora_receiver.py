@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 from flask import Flask, render_template, send_from_directory, jsonify, request
+import requests, json
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -12,25 +13,25 @@ app = Flask(__name__, static_url_path='/static')
 # Formats the data like this: 34.28, -118.43, 'Location=San Fernando Smoke Level=653 Temp=56 C',
 def constructLocation(content):
     data = content["payload_fields"]
-    TEMP = str(float(data["temperature_1"]) * (9/5) + 32.0)
-    HUMID = data["relative_humidity_2"]
-    SMOKE = data["analog_out_3"]
+    TEMP = '%.1f'%(float(data["temperature_1"]) * (9/5) + 32.0)
+    HUMID = str(data["relative_humidity_2"])
+    SMOKE = str(data["analog_out_3"])
 
     location = content['metadata']
-    lat = location['latitude']
-    long = location['longitude']
+    lat = str(location['latitude'])
+    long = str(location['longitude'])
 
     response = requests.get("https://api.tomtom.com/search/2/reverseGeocode/"+lat+"%2C"+long+".json?key=4mXdXKAv0CQKru0SpInttSAw2CVOliMz")
     responseData = json.loads(response.text)
-    city = responseData['addresses'][0]['address']['freeformAddress']
+    city = responseData['addresses'][0]['address']['freeformAddress'].replace(",","")
 
     speedData = requests.get("https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+long+"&appid=37e350cbd0d4c12e3438f9a194a20693")
     data_wind = json.loads(speedData.text)
 
     # convert m/s --> mph
-    windSpeed = str(float(data_wind["wind"]["speed"]) * 2.23694)
+    windSpeed = '%.1f'%(float(data_wind["wind"]["speed"]) * 2.23694)
 
-    csv = lat + "," + long + "," + "\'Location: " + city + ", Smoke Level: " + SMOKE + " ppm Temp: " + TEMP + "°C Wind: " + windSpeed + " mph\',"
+    csv = lat + ", " + long + ", " + "\'Location: " + city + " Smoke Level: " + SMOKE + " ppm Temp: " + TEMP + "°C Wind: " + windSpeed + " mph\',"
     print(csv)
     return csv
 
@@ -39,9 +40,10 @@ def result():
     print("Received")
     content = request.json # should display 'bar'
 
-    csv = constructLocation(content)
     markers = open("marker_locations.txt","a")
-    #markers.write(csv)
+    csv = constructLocation(content)
+    markers.write(csv)
+    markers.close()
 
     return '',200 # response to your request.
 
@@ -85,7 +87,7 @@ def destination():
 @app.route('/data/locations')
 def locations():
     fin = open("marker_locations.txt","r")
-    ret = fin.read()
+    ret = fin.read()[:-1]
     fin.close()
     return ret
 
@@ -101,7 +103,7 @@ def route():
 
 @app.route('/')
 def home():
-  return app.send_static_file('index.html')
+  return app.send_static_file('index.html'),200
 
 @app.route('/about')
 def about():
@@ -123,7 +125,6 @@ def reports():
 
 if __name__ == '__main__':
   app.run(host="0.0.0.0",port=8000,debug=True)
-
 
 #if __name__ == "__main__":
 #    app.run(host='0.0.0.0', port=8000)
