@@ -55,9 +55,9 @@ def constructLocation(content):
     inputs[0].append(float(HUMID))
     inputs[0].append(windSpeedkmh)
     print("INPUTS:", str(inputs))
-    burnedArea = getPrediction(inputs)
+    burnedArea = getPrediction(inputs)[0][0]
     print("PREDICTED BURN AREA:",str(burnedArea))
-    generate_email(lat, long, TEMP, city, windString)
+    generate_email(lat, long, TEMP, city, windString, burnedArea)
     csv = lat + ", " + long + ", " + "\'Location: " + city + " Smoke Level: " + SMOKE + " ppm Temp: " + TEMP + "°F Wind: " + windString + " mph\',"
     print(csv)
     return csv

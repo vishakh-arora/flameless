@@ -61,16 +61,17 @@ def mail(to, subject, text=None, html=None, attach=None):
    # Should be mailServer.quit(), but that crashes...
    mailServer.close()
 
-def generate_email(lat, long, temp, city, wind):
+def generate_email(lat, long, temp, city, wind, area):
     #i = vals
     to = "9259646667@txt.att.net"
     #name = i[COL_NAME]
+    area = int(round(area * 2.47105))
 
     subject = "Fire Detected"
 
      # The embedded image doesn't show up in gmail so use inline attachment
      # '<br>\n<img src="data:image/png;base64,{0}" alt="">'.format(data_uri) + \
-    htmlbody = 'Fire detected at (%s, %s) with temperature %s F heading for %s at %s mph' % (lat, long, temp, city, wind)
+    htmlbody = 'Fire detected at (%s, %s) with temperature %s F heading for %s at %s mph with an estimated burn area of %s acres.' % (lat, long, temp, city, wind, area)
     print("TEXTTT: "+htmlbody)
 #    textbody=strip_html( htmlbody)
 
